@@ -1,0 +1,11 @@
+{
+    "name": "GitHub Review Tool",
+    "version": "1.0",
+    "manifest_version": 2,
+    "content_scripts": [
+        {
+            "js": ["src/lib/jquery-1.8.1.min.js", "src/js/main.js"],
+            "matches": ["https://github.com/*", "https://github.dev.cybozu.co.jp/*"]
+        }
+    ]
+}
