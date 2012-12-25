@@ -62,9 +62,30 @@ $(document).ready(function() {
             var id = this.id;
             // r1234 がコメントIDのはず
             if (id.match(/^r\d+/)) {
-                self.setValue_(id, false);
+                self.addComment_({commentId: id, isUnread: false});
             }
         });
+    };
+
+    /**
+     * @param {Object.<hubreview.Unreader.CommentModel>} comment
+     * @private
+     */
+    hubreview.Unreader.prototype.addComment_ = function(comment) {
+        var comments = this.getValue_('comments') || [];
+        var targetIndex = -1;
+        var targetComment = $(comments).filter(function(index) {
+            targetIndex = index;
+            return this.commentId === comment.commentId;
+        });
+
+        if (targetComment.length === 0) {
+            comments.push(comment);
+        } else {
+            comments[targetIndex] = comment;
+        }
+
+        this.setValue_('comments', comments);
     };
 
     /**
@@ -74,18 +95,21 @@ $(document).ready(function() {
      * @private
      */
     hubreview.Unreader.prototype.setValue_ = function(key, value) {
-        var data = localStorage.getItem(this.pullId_) || {};
-        data[key] = value;
-        localStorage.setItem(this.pullId_, data);
+        var data = localStorage.getItem(this.pullId_) ;
+        var json = data ? JSON.parse(data) : {};
+        json[key] = value;
+        localStorage.setItem(this.pullId_, JSON.stringify(json));
     };
 
     /**
      * @param {string} key
+     * @return {Object}
      * @private
      */
     hubreview.Unreader.prototype.getValue_ = function(key) {
         var data = localStorage.getItem(this.pullId_);
-        return data[key];
+        var json = data ? JSON.parse(data) : {};
+        return json[key];
     };
 
     /**
