@@ -33,7 +33,7 @@ $(document).ready(function() {
     /**
      * ローカルストレージ {pullId: Object} に対するObjectの部分
      * @typedef {{
-     *   comments: Array.<hubreview.Unreader.CommentModel>
+     *   comments: Object.<hubreview.Unreader.CommentModel>
      * }}
      */
     hubreview.Unreader.DataModel;
@@ -48,23 +48,105 @@ $(document).ready(function() {
     hubreview.Unreader.CommentModel;
 
     /**
-     * localstrageのkey prefix
-     * @type {string}
-     * @private
-     */
-    hubreview.Unreader.prototype.keyPrefix_ = 'hubkari-';
-
-    /**
      */
     hubreview.Unreader.prototype.run = function() {
         var self = this;
         $('.comment').each(function() {
             var id = this.id;
+            var comments = self.getComments_();
             // r1234 がコメントIDのはず
-            if (id.match(/^r\d+/)) {
-                self.addComment_({commentId: id, isUnread: false});
+            if (id.match(/^(r|issuecomment-|commitcomment-)\d+/)) {
+                self.addUnreadClass_($(this), comments[id], id);
+            } else {
+                var m = id.match(/^discussion_(r\d+)/);
+                var preId = m ? m[1] : null;
+                var c = self.getComment_(preId);
+                if (c && c.isUnread) {
+                    self.addUnreadClass_($(this), c, preId);
+                    id = preId;
+                }
             }
+
+            // 一定時間hoverされたら既読にする
+            $(this).hover(function() {
+                var el = $(this);
+                var t = setTimeout(function() {
+                    var com = self.getComments_()[id];
+                    if (com && !com.fixedUnread) {
+                        self.unread_(id, el, false);
+                    }
+                }, 500);
+                $(this).data('timeout', t);
+            }, function() {
+                clearTimeout($(this).data('timeout'));
+            });
         });
+    };
+
+    /**
+     * @param {Element} el
+     * @param {hubreview.Unreader.CommentModel} comment
+     * @param {string} commentIdStr
+     * @private
+     */
+    hubreview.Unreader.prototype.addUnreadClass_ = function(el, comment, commentIdStr) {
+        if (comment && comment.isUnread) {
+            $(el).addClass('hubreview-unread-comment');
+        } else if (!comment) {
+            this.addComment_({commentId: commentIdStr, isUnread: true});
+        }
+        var unreadButton = this.createUnreadButton_(commentIdStr, el);
+        $('.comment-header', el).append(unreadButton);
+    };
+
+    /**
+     * @param {string} commentId
+     * @param {Element} el
+     * @private
+     * @return {Element}
+     */
+    hubreview.Unreader.prototype.createUnreadButton_ = function(commentId, el) {
+        var buttonEl = $('<span/>').addClass('hubreview-unread-button');
+        var checkEl = $('<input/>').attr('type', 'checkbox').addClass('hubreview-unread-check').attr('id', 'hubreview-unread-' + commentId);
+        var labelEl = $('<label/>').addClass('hubreview-unread-label').text('keep!').attr('for', 'hubreview-unread-' + commentId);
+        buttonEl.append(checkEl);
+        buttonEl.append(labelEl);
+        var com = this.getComment_(commentId);
+        if (com && com.fixedUnread) {
+            $(checkEl).attr('checked', true);
+            $(labelEl).addClass('keep');
+        }
+
+        var self = this;
+        checkEl.click(function(evt) {
+            var com = self.getComment_(commentId);
+            if (com && !com.isUnread) {
+                self.unread_(commentId, el, true, true);
+                $(labelEl).addClass('keep');
+            } else if (com && com.isUnread) {
+                self.unread_(commentId, el, false, false);
+                $(labelEl).removeClass('keep');
+            }
+            evt.stopPropagation();
+        });
+        return buttonEl;
+    };
+
+    /**
+     * @param {string} commentId
+     * @param {Element} el
+     * @param {boolean} isUnread
+     * @param {boolean} opt_fixedUnread ホバーで既読にしない
+     * @private
+     * @return {Element}
+     */
+    hubreview.Unreader.prototype.unread_ = function(commentId, el, isUnread, opt_fixedUnread) {
+        this.addComment_({commentId: commentId, isUnread: isUnread, fixedUnread: opt_fixedUnread});
+        if (isUnread) {
+            $(el).addClass('hubreview-unread-comment');
+        } else {
+            $(el).removeClass('hubreview-unread-comment');
+        }
     };
 
     /**
@@ -72,20 +154,26 @@ $(document).ready(function() {
      * @private
      */
     hubreview.Unreader.prototype.addComment_ = function(comment) {
-        var comments = this.getValue_('comments') || [];
-        var targetIndex = -1;
-        var targetComment = $(comments).filter(function(index) {
-            targetIndex = index;
-            return this.commentId === comment.commentId;
-        });
-
-        if (targetComment.length === 0) {
-            comments.push(comment);
-        } else {
-            comments[targetIndex] = comment;
-        }
-
+        var comments = this.getComments_();
+        comments[comment.commentId] = comment;
         this.setValue_('comments', comments);
+    };
+
+    /**
+     * @return {Object.<hubreview.Unreader.CommentModel>}
+     * @private
+     */
+    hubreview.Unreader.prototype.getComments_ = function() {
+        return this.getValue_('comments') || {};
+    };
+
+    /**
+     * @return {hubreview.Unreader.CommentModel}
+     * @private
+     */
+    hubreview.Unreader.prototype.getComment_ = function(commentId) {
+        var comments = this.getValue_('comments') || {};
+        return comments[commentId];
     };
 
     /**
