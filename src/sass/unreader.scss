@@ -1,0 +1,41 @@
+@import "compass";
+
+.hubreview-unread-comment {
+  .comment-header {
+    background: -webkit-linear-gradient(top, #F8FBFC, #F3F352) !important;
+  }
+  .comment-body {
+    background-color: #FAFFC7;
+  }
+}
+
+.hubreview-unread-button {
+  vertical-align: middle;
+}
+
+.hubreview-unread-check {
+  margin: 0 2px 0 5px;
+  vertical-align: middle;
+}
+.hubreview-unread-check {
+  height: 16px;
+}
+
+.hubreview-unread-label {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 2px;
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &.keep {
+    font-weight: normal;
+    padding: 3px 5px 2px;
+    font-size: 11px;
+    color: #000;
+    text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.7);
+    background: #ffae1b;
+    border-radius: 2px;
+  }
+}
