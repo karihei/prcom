@@ -1,11 +1,16 @@
 {
-    "name": "GitHub Review Tool",
+    "name": "Github Review Tool",
     "version": "1.0",
     "manifest_version": 2,
     "content_scripts": [
         {
             "js": ["src/lib/jquery-1.8.1.min.js", "src/js/main.js"],
+            "css": ["src/css/unreader.css"],
             "matches": ["https://github.com/*", "https://github.dev.cybozu.co.jp/*"]
         }
-    ]
+    ],
+    "browser_action": {
+        "default_title": "Github Review Tool",
+        "default_popup": "src/html/popup.html"
+    }
 }
