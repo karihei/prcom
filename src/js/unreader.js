@@ -54,17 +54,21 @@ $(document).ready(function() {
         $('.comment').each(function() {
             var id = this.id;
             var comments = self.getComments_();
-            // r1234 がコメントIDのはず
+
             if (id.match(/^(r|issuecomment-|commitcomment-)\d+/)) {
                 self.addUnreadClass_($(this), comments[id], id);
-            } else {
-                var m = id.match(/^discussion_(r\d+)/);
-                var preId = m ? m[1] : null;
-                var c = self.getComment_(preId);
-                if (c && c.isUnread) {
-                    self.addUnreadClass_($(this), c, preId);
-                    id = preId;
+            } else if (id.match(/^discussion_(r\d+)/)) {
+                // ID:discussion_r1234 と r1234 は同じコメントを指すため、
+                // r1234側で既に未読管理がされている場合はdiscussion_r1234も
+                // ステータスをそれに合わせる。
+                var pareId = id.match(/^discussion_(r\d+)/)[1];
+                var c = self.getComment_(pareId);
+                if (c) {
+                    self.addUnreadClass_($(this), c, pareId);
+                } else if (!c){
+                    self.addUnreadClass_($(this), comments[pareId], pareId);
                 }
+                id = pareId;
             }
 
             // 一定時間hoverされたら既読にする
@@ -75,7 +79,7 @@ $(document).ready(function() {
                     if (com && !com.fixedUnread) {
                         self.unread_(id, el, false);
                     }
-                }, 500);
+                }, 700);
                 $(this).data('timeout', t);
             }, function() {
                 clearTimeout($(this).data('timeout'));
@@ -163,7 +167,11 @@ $(document).ready(function() {
      * @return {Object.<hubreview.Unreader.CommentModel>}
      * @private
      */
-    hubreview.Unreader.prototype.getComments_ = function() {
+    hubreview.Unreader.prototype.getComments_ = function(callback) {
+        chrome.extension.sendRequest({'action': 'getComments', 'pullId': this.pullId_},
+            function(comments) {
+                debugger;
+            });
         return this.getValue_('comments') || {};
     };
 

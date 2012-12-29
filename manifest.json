@@ -1,10 +1,14 @@
 {
     "name": "Github Review Tool",
+    "description": "githubのコメントの未読管理とかいろいろするやつ。",
     "version": "1.0",
     "manifest_version": 2,
+    "update_url": "http://karix.jp/extensions/grt_update.xml",
+    "icons": {"48": "src/img/icon.png",
+        "128": "src/img/icon.png"},
     "content_scripts": [
         {
-            "js": ["src/lib/jquery-1.8.1.min.js", "src/js/main.js"],
+            "js": ["src/js/lib/jquery-1.8.1.min.js", "src/js/unreader.js"],
             "css": ["src/css/unreader.css"],
             "matches": ["https://github.com/*", "https://github.dev.cybozu.co.jp/*"]
         }
@@ -12,5 +16,8 @@
     "browser_action": {
         "default_title": "Github Review Tool",
         "default_popup": "src/html/popup.html"
+    },
+    "background":{
+        "page": "src/html/background.html"
     }
 }

@@ -1,4 +1,5 @@
 @import "compass";
+@import "compass/css3/user-interface";
 
 .hubreview-unread-comment {
   .comment-header {
@@ -25,6 +26,8 @@
   cursor: pointer;
   font-weight: bold;
   padding: 2px;
+  @include user-select(none);
+
   &:hover {
     text-decoration: underline;
   }

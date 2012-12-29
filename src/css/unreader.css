@@ -1,39 +1,42 @@
-/* line 4, ../sass/unreader.scss */
+/* line 5, ../sass/unreader.scss */
 .hubreview-unread-comment .comment-header {
   background: -webkit-linear-gradient(top, #f8fbfc, #f3f352) !important;
 }
-/* line 7, ../sass/unreader.scss */
+/* line 8, ../sass/unreader.scss */
 .hubreview-unread-comment .comment-body {
   background-color: #FAFFC7;
 }
 
-/* line 12, ../sass/unreader.scss */
+/* line 13, ../sass/unreader.scss */
 .hubreview-unread-button {
   vertical-align: middle;
 }
 
-/* line 16, ../sass/unreader.scss */
+/* line 17, ../sass/unreader.scss */
 .hubreview-unread-check {
   margin: 0 2px 0 5px;
   vertical-align: middle;
 }
 
-/* line 20, ../sass/unreader.scss */
+/* line 21, ../sass/unreader.scss */
 .hubreview-unread-check {
   height: 16px;
 }
 
-/* line 24, ../sass/unreader.scss */
+/* line 25, ../sass/unreader.scss */
 .hubreview-unread-label {
   cursor: pointer;
   font-weight: bold;
   padding: 2px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
-/* line 28, ../sass/unreader.scss */
+/* line 31, ../sass/unreader.scss */
 .hubreview-unread-label:hover {
   text-decoration: underline;
 }
-/* line 32, ../sass/unreader.scss */
+/* line 35, ../sass/unreader.scss */
 .hubreview-unread-label.keep {
   font-weight: normal;
   padding: 3px 5px 2px;
