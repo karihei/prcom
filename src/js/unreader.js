@@ -65,7 +65,7 @@ $(document).ready(function() {
                 var c = self.getComment_(pareId);
                 if (c) {
                     self.addUnreadClass_($(this), c, pareId);
-                } else if (!c){
+                } else {
                     self.addUnreadClass_($(this), comments[pareId], pareId);
                 }
                 id = pareId;
@@ -98,6 +98,7 @@ $(document).ready(function() {
             $(el).addClass('hubreview-unread-comment');
         } else if (!comment) {
             this.addComment_({commentId: commentIdStr, isUnread: true});
+            $(el).addClass('hubreview-unread-comment');
         }
         var unreadButton = this.createUnreadButton_(commentIdStr, el);
         $('.comment-header', el).append(unreadButton);
